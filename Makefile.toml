@@ -1,0 +1,107 @@
+env_files = [
+    ".env"
+]
+
+[config]
+default_to_workspace = false
+skip_core_tasks = true
+
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
+
+
+
+
+[tasks.cluster-start]
+private=true
+description = "Start the kind cluster"
+category = "Local Cluster (kind)"
+condition_script = ['''
+kind create cluster --name $CLUSTER_NAME --config kind_cluster.yaml --wait 1m
+''']
+script = '''
+sleep 10s
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml --wait
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=180s
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.2/cert-manager.yaml
+echo "cluster ready!"
+'''
+
+
+
+
+[tasks.kind-start]
+description = "Start the kind cluster"
+category = "Local Cluster (kind)"
+dependencies = ["cluster-start", "set-secrets"]
+
+
+
+
+[tasks.start]
+description = "Start the whole thingy"
+category = "System"
+dependencies = ["kind-start"]
+
+
+
+
+[tasks.status]
+description = "Watch the system status"
+category = "System"
+command = "watch"
+args = ["kubectl", "get", "all", "-n", "argocd"]
+
+
+
+
+[tasks.kill]
+description = "Clear resources and delete the kind cluster"
+category = "System"
+script_runner = "@shell"
+script = '''
+kind delete cluster --name $CLUSTER_NAME
+'''
+
+
+
+
+[tasks.helm-deploy]
+private = false
+description = "Apply deployment with helm"
+category = "Local Cluster (kind)"
+cwd = "./vp/"
+condition_script = [
+    'helm dependency build',
+    'helm install vp .'
+]
+script = '''
+echo "deployed!"
+'''
+
+
+[tasks.passwords]
+description = "Get passwords"
+category = "Local Cluster (kind)"
+script = '''
+wp_password=$(kubectl get secret vp-wordpress -o jsonpath="{.data.wordpress-password}" | base64 -d)
+
+echo "http://vp.localhost -> user: user; password: ${wp_password:-<generating...>}"
+'''
+
+
+
+
+[tasks.set-secrets]
+description = "Set secrets for various services"
+category = "Local Cluster (kind)"
+script_runner = "bash"
+script = [
+'''
+# empty
+'''
+]
+
