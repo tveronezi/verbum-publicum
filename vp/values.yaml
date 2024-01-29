@@ -107,3 +107,10 @@ wordpress:
     enabled: true
     ingressClassName: "nginx"
     hostname: "wp.localhost"
+  extraVolumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: verbum-publicum-pvc
+  extraVolumeMounts:
+  - name: data
+    mountPath: /opt/volume
