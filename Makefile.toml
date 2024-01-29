@@ -9,9 +9,6 @@ skip_core_tasks = true
 [env]
 CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
 
-
-
-
 [tasks.cluster-start]
 private=true
 description = "Start the kind cluster"
@@ -30,33 +27,71 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 echo "cluster ready!"
 '''
 
+[tasks.deploy-persistence-pv]
+private = true
+category = "Local Cluster (kind)"
+condition_script = [
+  'kubectl apply -f pv-localhost.yaml',
+]
+script = '''
+echo "deployed pv!"
+'''
 
+[tasks.deploy-persistence-pvc]
+private = true
+category = "Local Cluster (kind)"
+condition_script = [
+  'kubectl apply -f pvc-localhost.yaml',
+]
+script = '''
+echo "deployed pvc!"
+'''
 
+[tasks.deploy-persistence]
+description = "Deploy the localhost persistence"
+category = "Local Cluster (kind)"
+dependencies = ["deploy-persistence-pv", "deploy-persistence-pvc"]
+
+[tasks.undeploy-persistence-pv]
+private = true
+category = "Local Cluster (kind)"
+condition_script = [
+  'kubectl delete -f pv-localhost.yaml',
+]
+script = '''
+echo "undeployed pv!"
+'''
+
+[tasks.undeploy-persistence-pvc]
+private = true
+category = "Local Cluster (kind)"
+condition_script = [
+  'kubectl delete -f pvc-localhost.yaml',
+]
+script = '''
+echo "undeployed pvc!"
+'''
+
+[tasks.undeploy-persistence]
+description = "Undeploy the localhost persistence"
+category = "Local Cluster (kind)"
+dependencies = ["undeploy-persistence-pv", "undeploy-persistence-pvc"]
 
 [tasks.kind-start]
 description = "Start the kind cluster"
 category = "Local Cluster (kind)"
-dependencies = ["cluster-start", "set-secrets"]
-
-
-
+dependencies = ["cluster-start"]
 
 [tasks.start]
 description = "Start the whole thingy"
 category = "System"
 dependencies = ["kind-start"]
 
-
-
-
 [tasks.status]
 description = "Watch the system status"
 category = "System"
 command = "watch"
-args = ["kubectl", "get", "all", "-n", "argocd"]
-
-
-
+args = ["kubectl", "get", "all"]
 
 [tasks.kill]
 description = "Clear resources and delete the kind cluster"
@@ -66,12 +101,9 @@ script = '''
 kind delete cluster --name $CLUSTER_NAME
 '''
 
-
-
-
-[tasks.helm-deploy]
+[tasks.deploy-wp]
 private = false
-description = "Apply deployment with helm"
+description = "Deploy wordpress"
 category = "Local Cluster (kind)"
 cwd = "./vp/"
 condition_script = [
@@ -79,9 +111,23 @@ condition_script = [
     'helm install vp .'
 ]
 script = '''
-echo "deployed!"
+echo "wordpress deployed!"
 '''
+dependencies = ["deploy-persistence"]
 
+[tasks.undeploy-wp]
+private = false
+description = "Deploy wordpress"
+category = "Local Cluster (kind)"
+cwd = "./vp/"
+condition_script = [
+    'helm delete vp',
+    'kubectl delete pvc data-vp-mariadb-0'
+]
+script = '''
+echo "wordpress undeployed!"
+'''
+dependencies = ["undeploy-persistence"]
 
 [tasks.passwords]
 description = "Get passwords"
@@ -91,17 +137,3 @@ wp_password=$(kubectl get secret vp-wordpress -o jsonpath="{.data.wordpress-pass
 
 echo "http://vp.localhost -> user: user; password: ${wp_password:-<generating...>}"
 '''
-
-
-
-
-[tasks.set-secrets]
-description = "Set secrets for various services"
-category = "Local Cluster (kind)"
-script_runner = "bash"
-script = [
-'''
-# empty
-'''
-]
-
