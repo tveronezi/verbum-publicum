@@ -7,5 +7,5 @@ Install https://github.com/sagiegurari/cargo-make  and any other dependency you 
 ```bash
 ```bash
 cp .env_sample .env
-tveronezi$ m kill && m start && m deploy && m deploy-persistence && m set-secrets && m status
+makers kill && makers start && makers deploy && makers deploy-persistence && makers set-secrets && makers status
 ```
