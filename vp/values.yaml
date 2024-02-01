@@ -100,12 +100,22 @@ affinity: {}
 nextcloud:
   nextcloud:
     host: "intra.localhost"
+    existingSecret:
+      enabled: true
+      secretName: nextcloud-secrets
+      usernameKey: nextcloud-username
+      passwordKey: nextcloud-password
+      tokenKey: nextcloud-token
   ingress:
     enabled: true
     className: "nginx"
 
 wordpress:
   wordpressBlogName: "verbum publicum"
+  existingSecret: "wordpress-secrets"
+  mariadb:
+    externalDatabase:
+      existingSecret: "nextcloud-mariadb-secrets"
   resources:
     requests:
       memory: 2Gi
