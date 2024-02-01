@@ -18,3 +18,6 @@ makers undeploy-wp && makers deploy-wp && makers status
 makers --list-all-steps
 makers kill && makers start && makers deploy-wp && makers status
 ```
+
+
+helm repo add nextcloud https://nextcloud.github.io/helm/

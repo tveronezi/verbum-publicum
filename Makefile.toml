@@ -107,17 +107,18 @@ description = "Deploy wordpress"
 category = "Local Cluster (kind)"
 cwd = "./vp/"
 condition_script = [
+    'helm dependency update',
     'helm dependency build',
     'helm install vp .'
 ]
 script = '''
-echo "wordpress deployed!"
+echo "stuff deployed!"
 '''
 dependencies = ["deploy-persistence"]
 
 [tasks.undeploy-wp]
 private = false
-description = "Deploy wordpress"
+description = "Deploy stuff"
 category = "Local Cluster (kind)"
 cwd = "./vp/"
 condition_script = [
@@ -125,7 +126,7 @@ condition_script = [
     'kubectl delete pvc data-vp-mariadb-0'
 ]
 script = '''
-echo "wordpress undeployed!"
+echo "stuff undeployed!"
 '''
 dependencies = ["undeploy-persistence"]
 
@@ -134,6 +135,9 @@ description = "Get passwords"
 category = "Local Cluster (kind)"
 script = '''
 wp_password=$(kubectl get secret vp-wordpress -o jsonpath="{.data.wordpress-password}" | base64 -d)
+intra_password=$(kubectl get secret vp-nextcloud -o jsonpath="{.data.nextcloud-password}" | base64 -d)
 
-echo "http://vp.localhost -> user: user; password: ${wp_password:-<generating...>}"
+
+echo "http://vp.localhost ->    user: user;  password: ${wp_password:-<generating...>}"
+echo "http://intra.localhost -> user: admin; password: ${intra_password:-<generating...>}"
 '''

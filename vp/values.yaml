@@ -97,6 +97,13 @@ tolerations: []
 
 affinity: {}
 
+nextcloud:
+  nextcloud:
+    host: "intra.localhost"
+  ingress:
+    enabled: true
+    className: "nginx"
+
 wordpress:
   wordpressBlogName: "verbum publicum"
   resources:
@@ -107,9 +114,9 @@ wordpress:
     enabled: true
     ingressClassName: "nginx"
     hostname: "wp.localhost"
-    wordpressExtraConfigContent: |
-      // running it in a cloudflare tunnel (tls from cloudflare and localhost on port 80)
-      $_SERVER['HTTPS'] = 'on';
+  wordpressExtraConfigContent: |
+    // running it in a cloudflare tunnel (tls from cloudflare and localhost on port 80)
+    $_SERVER['HTTPS'] = 'on';
   extraVolumes:
   - name: data
     persistentVolumeClaim:
