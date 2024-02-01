@@ -18,9 +18,6 @@ nextcloud:
 wordpress:
   wordpressBlogName: "verbum publicum"
   existingSecret: "wordpress-secrets"
-  mariadb:
-    externalDatabase:
-      existingSecret: "nextcloud-mariadb-secrets"
   resources:
     requests:
       memory: 512Mi
