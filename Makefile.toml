@@ -27,6 +27,15 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 echo "cluster ready!"
 '''
 
+[tasks.add-helm-repos]
+private=false
+description = "Add the required helm repositories to the local helm"
+category = "Local Cluster (kind)"
+script = '''
+helm repo add nextcloud https://nextcloud.github.io/helm/ | true
+helm repo add bitnami https://charts.bitnami.com/bitnami | true
+'''
+
 [tasks.deploy-persistence-pv]
 private = true
 category = "Local Cluster (kind)"
@@ -101,6 +110,14 @@ script = '''
 kind delete cluster --name $CLUSTER_NAME
 '''
 
+[tasks.deploy-cert]
+private = false
+description = "Deploy self-signed cert"
+category = "Local Cluster (kind)"
+script = '''
+kubectl apply -f self-signed-cert.yaml
+'''
+
 [tasks.deploy]
 private = false
 description = "Deploy wordpress"
@@ -109,11 +126,12 @@ cwd = "./vp/"
 condition_script = [
     'helm dependency update',
     'helm dependency build',
-    'helm install vp .'
+    'helm upgrade --install vp .'
 ]
 script = '''
 echo "stuff deployed!"
 '''
+dependencies = ["deploy-cert"]
 
 [tasks.undeploy]
 private = false

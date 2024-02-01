@@ -1,9 +1,9 @@
 dependencies:
 - name: wordpress
   repository: https://charts.bitnami.com/bitnami
-  version: 19.2.1
+  version: 19.2.2
 - name: nextcloud
   repository: https://nextcloud.github.io/helm/
   version: 4.5.12
-digest: sha256:0bc3182b362382e7aee6b7f475f73bb87c209ae90df5074a89bd3da737f048df
-generated: "2024-01-31T21:08:31.200284694-05:00"
+digest: sha256:469a23f0a3cadcd70463151f500e4b2c8ee11d8040980dae0b3189a35c2516db
+generated: "2024-02-01T09:04:40.168263768-05:00"
