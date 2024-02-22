@@ -27,10 +27,3 @@ dependencies:
   - name: wordpress
     version: "19.2.1"
     repository: "https://charts.bitnami.com/bitnami"
-
-  - name: nextcloud
-    version: "4.5.12"
-    repository: "https://nextcloud.github.io/helm/"
-
-# version: 4.5.12
-# appVersion: 28.0.1
