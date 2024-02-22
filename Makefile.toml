@@ -101,53 +101,39 @@ script = '''
 kind delete cluster --name $CLUSTER_NAME
 '''
 
-[tasks.deploy]
+[tasks.deploy-wp]
 private = false
 description = "Deploy wordpress"
 category = "Local Cluster (kind)"
 cwd = "./vp/"
 condition_script = [
-    'helm dependency update',
     'helm dependency build',
     'helm install vp .'
 ]
 script = '''
-echo "stuff deployed!"
+echo "wordpress deployed!"
 '''
+dependencies = ["deploy-persistence"]
 
-[tasks.undeploy]
+[tasks.undeploy-wp]
 private = false
-description = "Deploy stuff"
+description = "Deploy wordpress"
 category = "Local Cluster (kind)"
 cwd = "./vp/"
 condition_script = [
-    'helm delete vp'
+    'helm delete vp',
+    'kubectl delete pvc data-vp-mariadb-0'
 ]
 script = '''
-echo "stuff undeployed!"
+echo "wordpress undeployed!"
 '''
+dependencies = ["undeploy-persistence"]
 
-[tasks.set-secrets]
-description = "Set secrets for various services"
+[tasks.passwords]
+description = "Get passwords"
 category = "Local Cluster (kind)"
-script_runner = "bash"
-script = [
-    '''
-    # Create Nextcloud secrets
-    kubectl get secret nextcloud-secrets \
-    || kubectl create secret generic nextcloud-secrets \
-        --from-literal=nextcloud-password=$DEV_NEXTCLOUD_PASSWORD \
-        --from-literal=nextcloud-token=$DEV_NEXTCLOUD_TOKEN \
-        --from-literal=nextcloud-username=$DEV_NEXTCLOUD_USERNAME
+script = '''
+wp_password=$(kubectl get secret vp-wordpress -o jsonpath="{.data.wordpress-password}" | base64 -d)
 
-    kubectl get secret nextcloud-mariadb-secrets \
-    || kubectl create secret generic nextcloud-mariadb-secrets \
-        --from-literal=nextcloud-mariadb-password=$DEV_NEXTCLOUD_MARIADB-PASSWORD \
-        --from-literal=nextcloud-mariadb-root-password=$DEV_NEXTCLOUD_MARIADB-ROOT-PASSWORD
-
-    # Create Wordpress secrets
-    kubectl get secret wordpress-secrets \
-    || kubectl create secret generic wordpress-secrets \
-        --from-literal=wordpress-password=$DEV_WORDPRESS_PASSWORD \
-    '''
-]
+echo "http://vp.localhost -> user: user; password: ${wp_password:-<generating...>}"
+'''

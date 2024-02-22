@@ -97,25 +97,8 @@ tolerations: []
 
 affinity: {}
 
-nextcloud:
-  nextcloud:
-    host: "intra.localhost"
-    existingSecret:
-      enabled: true
-      secretName: nextcloud-secrets
-      usernameKey: nextcloud-username
-      passwordKey: nextcloud-password
-      tokenKey: nextcloud-token
-  ingress:
-    enabled: true
-    className: "nginx"
-
 wordpress:
   wordpressBlogName: "verbum publicum"
-  existingSecret: "wordpress-secrets"
-  mariadb:
-    externalDatabase:
-      existingSecret: "nextcloud-mariadb-secrets"
   resources:
     requests:
       memory: 2Gi
@@ -124,9 +107,9 @@ wordpress:
     enabled: true
     ingressClassName: "nginx"
     hostname: "wp.localhost"
-  wordpressExtraConfigContent: |
-    // running it in a cloudflare tunnel (tls from cloudflare and localhost on port 80)
-    $_SERVER['HTTPS'] = 'on';
+    wordpressExtraConfigContent: |
+      // running it in a cloudflare tunnel (tls from cloudflare and localhost on port 80)
+      $_SERVER['HTTPS'] = 'on';
   extraVolumes:
   - name: data
     persistentVolumeClaim:

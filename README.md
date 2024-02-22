@@ -2,10 +2,19 @@
 
 ## How to?
 
-Install https://github.com/sagiegurari/cargo-make  and any other dependency you see in the `Makefile.toml` file then...
+Install https://github.com/sagiegurari/cargo-make then...
+
+### From existing cluster
 
 ```bash
 ```bash
-cp .env_sample .env
-tveronezi$ m kill && m start && m deploy && m deploy-persistence && m set-secrets && m status
+makers --list-all-steps
+makers undeploy-wp && makers deploy-wp && makers status
+```
+
+### From scratch
+
+```bash
+makers --list-all-steps
+makers kill && makers start && makers deploy-wp && makers status
 ```
