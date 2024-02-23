@@ -108,12 +108,11 @@ category = "Local Cluster (kind)"
 cwd = "./vp/"
 condition_script = [
     'helm dependency build',
-    'helm install vp .'
+    'helm upgrade -i vp .'
 ]
 script = '''
 echo "wordpress deployed!"
 '''
-dependencies = ["deploy-persistence"]
 
 [tasks.undeploy-wp]
 private = false
@@ -127,7 +126,6 @@ condition_script = [
 script = '''
 echo "wordpress undeployed!"
 '''
-dependencies = ["undeploy-persistence"]
 
 [tasks.passwords]
 description = "Get passwords"
