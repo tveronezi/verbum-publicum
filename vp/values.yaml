@@ -30,6 +30,7 @@ wordpress:
     enabled: false
     ingressClassName: "nginx"
     hostname: "wp.localhost"
+  wordpressScheme: "https"
   wordpressExtraConfigContent: |
     // running it in a cloudflare tunnel (tls from cloudflare and localhost on port 80)
     $_SERVER['HTTPS'] = 'on';
