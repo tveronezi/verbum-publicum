@@ -141,8 +141,6 @@ resource "helm_release" "wordpress" {
           }]
         }
       ]
-
-
       ingress = {
         enabled = true
         annotations = {
